@@ -24,15 +24,12 @@ total_steps_per_day <- tapply(activity_df$steps, activity_df$date, sum, na.rm=T)
 # Make histogram of total steps per day
 hist(total_steps_per_day, main="Total steps per day histogram", xlab="Steps per day")
 
-# Get mean and median total steps per day
-total_steps_per_day_mean <- round(mean(total_steps_per_day, na.rm=T), 2)
-total_steps_per_day_median <- round(median(total_steps_per_day, na.rm=T), 2)
+# Mean total steps per day
+round(mean(total_steps_per_day, na.rm=T), 2)
+
+# Median total steps per day
+round(median(total_steps_per_day, na.rm=T), 2)
 ```
-
-Total steps per day:
-
-- Mean: `r total_steps_per_day_mean`
-- Median: `r total_steps_per_day_median`
 
 
 ## What is the average daily activity pattern?
@@ -42,34 +39,38 @@ activity_df <- activity_df %>%
     mutate(steps_interval_mean = mean(steps, na.rm=T)) %>%
     as.data.frame
 
-with(activity_df, plot(interval, steps_interval_mean, type="l", main="Average daily activity", ylab="mean steps"))
+with(activity_df,
+     plot(interval, steps_interval_mean, type="l", main="Average daily activity", ylab="mean steps"))
+
+# Interval with maximum average daily steps
+activity_df[which.max(activity_df$steps_interval_mean),]$interval
 ```
 
 ## Imputing missing values
 ```{r}
-# Calculate fraction of missing step data as percentage
+# Calculate missing step data
 missing_steps_logical <- is.na(activity_df$steps)
-
+missing_data_count <- sum(missing_steps_logical)
 fraction_missing_data_perc <- round(mean(missing_steps_logical) * 100, 2)
+```
 
+`r missing_data_count` missing 'steps' datapoints (`r fraction_missing_data_perc` %)
+
+```{r}
 # Impute missing step data with interval step means
 activity_df[missing_steps_logical,]$steps <- activity_df[missing_steps_logical,]$steps_interval_mean
 
-steps_per_day_summed <- tapply(activity_df$steps, activity_df$date, sum, na.rm=T)
-hist(steps_per_day_summed, main="Total steps per day histogram (after imputation)", xlab="Steps per day")
-steps_per_day_summed_mean <- round(mean(steps_per_day_summed, na.rm=T), 2)
-steps_per_day_summed_median <- round(median(steps_per_day_summed, na.rm=T), 2)
+total_steps_per_day <- tapply(activity_df$steps, activity_df$date, sum, na.rm=T)
+
+# Make histogram of total steps per day
+hist(total_steps_per_day, main="Total steps per day histogram (after imputation)", xlab="Steps per day")
+
+# Mean total steps per day (after imputation)
+round(mean(total_steps_per_day, na.rm=T), 2)
+
+# Median total steps per day (after imputation)
+round(median(total_steps_per_day, na.rm=T), 2)
 ```
-
-`r fraction_missing_data_perc` % of steps data is missing.
-
-Total steps per day (after imputation):
-
-- Mean: `r steps_per_day_summed_mean`  
-- Median: `r steps_per_day_summed_median`
-
-Imputation seems to have no effect on these statistics
-
 
 ## Are there differences in activity patterns between weekdays and weekends?
 ```{r}

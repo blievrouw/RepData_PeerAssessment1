@@ -31,15 +31,22 @@ hist(total_steps_per_day, main="Total steps per day histogram", xlab="Steps per 
 ![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
 
 ```r
-# Get mean and median total steps per day
-total_steps_per_day_mean <- round(mean(total_steps_per_day, na.rm=T), 2)
-total_steps_per_day_median <- round(median(total_steps_per_day, na.rm=T), 2)
+# Mean total steps per day
+round(mean(total_steps_per_day, na.rm=T), 2)
 ```
 
-Total steps per day:
+```
+## [1] 9354.23
+```
 
-- Mean: 9354.23
-- Median: 10395
+```r
+# Median total steps per day
+round(median(total_steps_per_day, na.rm=T), 2)
+```
+
+```
+## [1] 10395
+```
 
 
 ## What is the average daily activity pattern?
@@ -50,42 +57,62 @@ activity_df <- activity_df %>%
     mutate(steps_interval_mean = mean(steps, na.rm=T)) %>%
     as.data.frame
 
-with(activity_df, plot(interval, steps_interval_mean, type="l", main="Average daily activity", ylab="mean steps"))
+with(activity_df,
+     plot(interval, steps_interval_mean, type="l", main="Average daily activity", ylab="mean steps"))
 ```
 
 ![](PA1_template_files/figure-html/average_daily_activity-1.png)<!-- -->
 
+```r
+# Interval with maximum average daily steps
+activity_df[which.max(activity_df$steps_interval_mean),]$interval
+```
+
+```
+## [1] 835
+```
+
 ## Imputing missing values
 
 ```r
-# Calculate fraction of missing step data as percentage
+# Calculate missing step data
 missing_steps_logical <- is.na(activity_df$steps)
-
+missing_data_count <- sum(missing_steps_logical)
 fraction_missing_data_perc <- round(mean(missing_steps_logical) * 100, 2)
+```
 
+2304 missing 'steps' datapoints (13.11 %)
+
+
+```r
 # Impute missing step data with interval step means
 activity_df[missing_steps_logical,]$steps <- activity_df[missing_steps_logical,]$steps_interval_mean
 
-steps_per_day_summed <- tapply(activity_df$steps, activity_df$date, sum, na.rm=T)
-hist(steps_per_day_summed, main="Total steps per day histogram (after imputation)", xlab="Steps per day")
+total_steps_per_day <- tapply(activity_df$steps, activity_df$date, sum, na.rm=T)
+
+# Make histogram of total steps per day
+hist(total_steps_per_day, main="Total steps per day histogram (after imputation)", xlab="Steps per day")
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 
 ```r
-steps_per_day_summed_mean <- round(mean(steps_per_day_summed, na.rm=T), 2)
-steps_per_day_summed_median <- round(median(steps_per_day_summed, na.rm=T), 2)
+# Mean total steps per day (after imputation)
+round(mean(total_steps_per_day, na.rm=T), 2)
 ```
 
-13.11 % of steps data is missing.
+```
+## [1] 10766.19
+```
 
-Total steps per day (after imputation):
+```r
+# Median total steps per day (after imputation)
+round(median(total_steps_per_day, na.rm=T), 2)
+```
 
-- Mean: 10766.19  
-- Median: 10766.19
-
-Imputation seems to have no effect on these statistics
-
+```
+## [1] 10766.19
+```
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
@@ -116,6 +143,6 @@ title(xlab = "interval",
       outer = TRUE, line = 3)
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
+![](PA1_template_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
 
 
